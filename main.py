@@ -27,11 +27,12 @@ TITLE_CLASS = 'teleprogram-item__title'
 TIME_CLASS = 'teleprogram-item__time'
 SCHEDULE_CLASS = 'schedule-line'
 
+
 subscribed_users = set()
+
 
 async def get_schedule(sport_type: str):
     url = BASE_URL
-
     async with aiohttp.ClientSession() as session:
         async with session.get(url) as response:
             response.raise_for_status()
@@ -43,20 +44,31 @@ async def get_schedule(sport_type: str):
 
     current_time_utc = dt.datetime.now(dt.timezone.utc).timestamp()
     time_range = 3 * 3600
+    min_time = current_time_utc - time_range
+    max_time = current_time_utc + time_range
 
     schedule = []
 
     for item, schedule_line in zip(schedule_items, schedule_lines):
-        title = item.find('div', class_='teleprogram-item__title').get_text(strip=True)
+        title = item.find(
+            'div',
+            class_='teleprogram-item__title'
+        ).get_text(strip=True)
         start_time = int(schedule_line.get('data-schedule-line-start', 0))
         end_time = int(schedule_line.get('data-schedule-line-end', 0))
-        if sport_type in title.lower() and current_time_utc - time_range <= start_time <= current_time_utc + time_range:
-            formatted_start_time = dt.datetime.fromtimestamp(start_time).strftime('%H:%M')
-            formatted_end_time = dt.datetime.fromtimestamp(end_time).strftime(
-                '%H:%M')
-            schedule.append(f"{formatted_start_time} - {formatted_end_time} - {title}")
+        if sport_type in title.lower() and min_time <= start_time <= max_time:
+            formatted_start_time = dt.datetime.fromtimestamp(
+                start_time
+            ).strftime('%H:%M')
+            formatted_end_time = dt.datetime.fromtimestamp(
+                end_time
+            ).strftime('%H:%M')
+            schedule.append(
+                f"{formatted_start_time} - {formatted_end_time} - {title}"
+            )
 
     return schedule
+
 
 async def check_schedule_and_notify(bot: Bot):
     while True:
@@ -68,21 +80,24 @@ async def check_schedule_and_notify(bot: Bot):
             message = ""
 
             if biathlon_schedule:
-                message += "Биатлон:\n" + "\n".join(biathlon_schedule) + "\n\n"
+                message += f"Биатлон:\n{'\n'.join(biathlon_schedule)}\n\n"
             if football_schedule:
-                message += "Футбол:\n" + "\n".join(football_schedule) + "\n\n"
+                message += f"Футбол:\n{'\n'.join(football_schedule)}\n\n"
             if billiards_schedule:
-                message += "Бильярд:\n" + "\n".join(billiards_schedule) + "\n\n"
+                message += f"Бильярд:\n{'\n'.join(billiards_schedule)}\n\n"
 
             if message:
                 for user_id in subscribed_users:
                     try:
                         await bot.send_message(user_id, message)
                     except Exception as e:
-                        logger.error(f"Error sending message to {user_id}: {e}")
+                        logger.error(
+                            f"Error sending message to {user_id}: {e}"
+                        )
         except Exception as e:
             logger.error(f"Error while checking schedule: {e}")
         await asyncio.sleep(10800)
+
 
 @dp.message(Command('start'))
 async def send_welcome(message: types.Message):
@@ -94,36 +109,58 @@ async def send_welcome(message: types.Message):
         logger.info(f"User {user_id} subscribed.")
 
     await message.answer(
-        "Привет! Я могу отправить тебе расписание биатлона или футбола.\nНапиши /biathlon, чтобы узнать расписание биатлона.\nНапиши /football, чтобы узнать расписание футбола."
-        "\nНапиши /billiards, чтобы узнать расписание бильярда.")
+        "Привет! Я могу отправить тебе расписание биатлона или футбола."
+        "\nНапиши /biathlon, чтобы узнать расписание биатлона."
+        "\nНапиши /football, чтобы узнать расписание футбола."
+        "\nНапиши /billiards, чтобы узнать расписание бильярда."
+    )
+
 
 @dp.message(Command("biathlon"))
-async def send_schedule(message: types.Message):
+async def send_biathlon_schedule(message: types.Message):
     schedule = await get_schedule('биатлон')
-    response = "\n".join(schedule) if schedule else "На данный момент биатлон не запланирован."
+    response = (
+        "\n".join(schedule) if schedule
+        else "На данный момент биатлон не запланирован."
+    )
     await message.answer(response, parse_mode='Markdown')
+
 
 @dp.message(Command("billiards"))
-async def send_schedule(message: types.Message):
+async def send_billiards_schedule(message: types.Message):
     schedule = await get_schedule('бильярд')
-    response = "\n".join(schedule)  if schedule else "На данный момент бильярд не запланирован."
+    response = (
+        "\n".join(schedule) if schedule
+        else "На данный момент бильярд не запланирован."
+    )
     await message.answer(response, parse_mode='Markdown')
 
+
 @dp.message(Command("football"))
-async def send_schedule(message: types.Message):
+async def send_football_schedule(message: types.Message):
     schedule = await get_schedule('футбол')
-    response = "\n".join(schedule)  if schedule else "На данный момент футбол не запланирован."
+    response = (
+        "\n".join(schedule) if schedule
+        else "На данный момент футбол не запланирован."
+    )
     await message.answer(response, parse_mode='Markdown')
+
 
 @dp.message()
 async def echo(message: types.Message):
-    await message.answer("Для получения расписания биатлона напиши /biathlon. Для получения расписания футбола напиши /football. Для получения расписания бильярда напиши /billiards")
+    await message.answer(
+        "Для получения расписания биатлона напиши /biathlon. "
+        "Для получения расписания футбола напиши /football. "
+        "Для получения расписания бильярда напиши /billiards"
+    )
+
 
 async def main():
     bot = Bot(token=API_TOKEN)
     await bot.delete_webhook(drop_pending_updates=True)
     asyncio.create_task(check_schedule_and_notify(bot))
     await dp.start_polling(bot)
+
 
 if __name__ == '__main__':
     logger.info("Bot is starting...")
