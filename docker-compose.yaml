@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  bot:
+    build: .
+    container_name: sport_bot
+    restart: unless-stopped
+    volumes:
+      - ./logs:/bot/logs
+    env_file:
+      - ./.env
+    command: [ "python", "-u", "bot.py" ]
