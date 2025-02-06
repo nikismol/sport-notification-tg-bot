@@ -1,3 +1,2 @@
 [flake8]
-ignore = E203, W503
 exclude = env, .git, migrations
