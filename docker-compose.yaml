@@ -3,7 +3,7 @@ version: '3.8'
 services:
   bot:
     build: .
-    container_name: sport_bot
+    container_name: sport_notification_tg_bot
     restart: unless-stopped
     volumes:
       - ./logs:/bot/logs
