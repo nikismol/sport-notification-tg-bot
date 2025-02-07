@@ -64,10 +64,10 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           passphrase: ${{ secrets.PASSPHRASE }}
           script: |
+            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/tg-bot-aiogram-app:latest
             sudo docker-compose down
             sudo docker rm -f sport_bot
             echo "API_TOKEN=${{ secrets.MAIN_TOKEN }}" > .env
-            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/tg-bot-aiogram-app:latest
             sudo docker-compose up -d
 
   send_message:
