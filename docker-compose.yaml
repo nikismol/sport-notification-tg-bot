@@ -1,12 +1,9 @@
-version: '3.8'
+version: '3'
 
 services:
   bot:
-    build: .
-    container_name: sport_notification_tg_bot
-    restart: unless-stopped
-    volumes:
-      - ./logs:/bot/logs
+    image: nikismol94/sport_notification_tg_bot
     env_file:
       - ./.env
-    command: [ "python", "-u", "bot.py" ]
+    volumes:
+      - ./logs:/bot/logs
