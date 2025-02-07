@@ -64,12 +64,6 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           passphrase: ${{ secrets.PASSPHRASE }}
           script: |
-            if sudo docker ps -a --format "{{.Names}}" | grep -q sport_notification_tg_bot; then
-              sudo docker stop sport_notification_tg_bot
-              sudo docker rm sport_notification_tg_bot
-            else
-              echo "Контейнер не найден. Пропускаем удаление."
-            fi
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/tg-bot-aiogram-app:latest
             echo "API_TOKEN=${{ secrets.MAIN_TOKEN }}" > .env
             sudo docker-compose up -d
