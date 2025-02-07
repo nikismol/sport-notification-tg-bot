@@ -49,6 +49,9 @@ jobs:
     needs: build_and_push_to_docker_hub
     if: github.ref == 'refs/heads/main'
     steps:
+      - name: Debug SSH Key
+        run: echo "${{ secrets.SSH_KEY }}" | wc -l
+
       - name: executing remote ssh commands to deploy
         uses: appleboy/ssh-action@master
         with:
