@@ -79,6 +79,7 @@ jobs:
             cd bot
             sudo docker-compose -f docker-compose.yaml pull
             sudo docker-compose -f ddocker-compose.yaml down
+            sudo docker ext 
             sudo docker-compose -f docker-compose.yaml up -d
             echo "API_TOKEN=${{ secrets.MAIN_TOKEN }}" > .env
             sudo docker-compose up -d

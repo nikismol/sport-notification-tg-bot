@@ -3,7 +3,5 @@ version: '3'
 services:
   bot:
     image: nikismol94/sport_notification_tg_bot
-    env_file:
-      - ./.env
     volumes:
       - ./logs:/bot/logs
