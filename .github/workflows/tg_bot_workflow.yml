@@ -78,11 +78,9 @@ jobs:
           script: |
             cd bot
             sudo docker-compose -f docker-compose.yaml pull
-            sudo docker-compose -f ddocker-compose.yaml down
-            sudo docker ext 
+            sudo docker-compose -f docker-compose.yaml down
+            sudo docker-compose -f docker-compose.yaml exec bot_bot_1 bash -c "echo 'API_TOKEN=${{ secrets.MAIN_TOKEN }}' > /bot/.env"
             sudo docker-compose -f docker-compose.yaml up -d
-            echo "API_TOKEN=${{ secrets.MAIN_TOKEN }}" > .env
-            sudo docker-compose up -d
 
   send_message:
     runs-on: ubuntu-latest
