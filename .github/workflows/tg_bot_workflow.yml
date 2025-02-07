@@ -62,7 +62,6 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USER }}
           key: ${{ secrets.SSH_KEY }}
-          trim: true
           passphrase: ${{ secrets.PASSPHRASE }}
           script: |
             set -e  # Остановит выполнение, если команда завершится с ошибкой
