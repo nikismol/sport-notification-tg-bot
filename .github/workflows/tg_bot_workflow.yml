@@ -76,6 +76,7 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           passphrase: ${{ secrets.PASSPHRASE }}
           script: |
+            sudo timedatectl set-timezone Europe/Moscow
             cd bot
             sudo docker-compose -f docker-compose.yaml pull
             sudo docker-compose -f docker-compose.yaml down
