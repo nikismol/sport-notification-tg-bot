@@ -28,5 +28,5 @@ docker-compose.override.yml
 # Environment Variables
 .env
 
-
+logs/
 .DS_Store
