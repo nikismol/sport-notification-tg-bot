@@ -1,4 +1,4 @@
-nname: tg-bot-aiogram-app workflow
+name: tg-bot-aiogram-app workflow
 
 on: [push]
 
