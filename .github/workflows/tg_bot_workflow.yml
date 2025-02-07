@@ -42,7 +42,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build and push Docker image
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v4
         with:
           push: true
           context: .
@@ -55,6 +55,15 @@ jobs:
     steps:
       - name: Debug SSH Key
         run: echo "${{ secrets.SSH_KEY }}" | wc -l
+      - name: Copy docker-compose.yml via ssh
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USER }}
+          key: ${{ secrets.SSH_KEY }}
+          passphrase: ${{ secrets.SSH_PASSPHRASE }}
+          source: "docker-compose.yaml"
+          target: "bot"
 
       - name: Deploy application
         uses: appleboy/ssh-action@master
@@ -64,7 +73,10 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           passphrase: ${{ secrets.PASSPHRASE }}
           script: |
-            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/tg-bot-aiogram-app:latest
+            cd bot
+            sudo docker compose -f docker-compose.yaml pull
+            sudo docker compose -f ddocker-compose.yaml down
+            sudo docker compose -f docker-compose.yaml up -d
             echo "API_TOKEN=${{ secrets.MAIN_TOKEN }}" > .env
             sudo docker-compose up -d
 
