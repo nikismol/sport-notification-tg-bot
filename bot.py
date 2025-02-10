@@ -4,9 +4,11 @@ import logging
 
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
+from aiogram.types import BotCommandScopeChat, BotCommandScopeAllPrivateChats
 from dotenv import load_dotenv
 
-from handlers import admin_handler
+from common.bot_cmds_list import private, owner_commands
+from handlers import admin_handler, user_handler
 from utils import get_schedule, subscribed_users
 
 
@@ -15,6 +17,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 API_TOKEN = os.getenv("API_TOKEN")
+OWNER_ID = int(os.getenv("OWNER_ID"))
 
 storage = MemoryStorage()
 
@@ -49,11 +52,33 @@ async def check_schedule_and_notify(bot: Bot):
 
 
 async def main():
-    bot = Bot(token=API_TOKEN)
-    dp = Dispatcher(storage=storage)
-    dp.include_routers(admin_handler.router)
-    await bot.delete_webhook(drop_pending_updates=True)
-    asyncio.create_task(check_schedule_and_notify(bot))
+    bot = Bot(
+        token=API_TOKEN
+    )
+    dp = Dispatcher(
+        storage=storage
+    )
+    dp.include_routers(
+        admin_handler.router,
+        user_handler.router
+    )
+    await bot.delete_webhook(
+        drop_pending_updates=True
+    )
+    await bot.delete_my_commands(
+        scope=BotCommandScopeAllPrivateChats()
+    )
+    await bot.set_my_commands(
+        commands=private,
+        scope=BotCommandScopeAllPrivateChats()
+    )
+    await bot.set_my_commands(
+        commands=owner_commands,
+        scope=BotCommandScopeChat(chat_id=OWNER_ID)
+    )
+    asyncio.create_task(
+        check_schedule_and_notify(bot)
+    )
     await dp.start_polling(bot)
 
 
