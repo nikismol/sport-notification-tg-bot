@@ -49,10 +49,6 @@ async def fetch_html_auto():
 
 
 async def get_schedule(sport_type: str):
-    if HTML_CACHE is None:
-        raise ValueError(
-            "HTML-страница не загружена. Используйте команду /update."
-        )
     soup = BeautifulSoup(HTML_CACHE, 'html.parser')
     schedule_items = soup.find_all('li', class_=ITEM_CLASS)
     schedule_lines = soup.find_all('div', class_=SCHEDULE_CLASS)
