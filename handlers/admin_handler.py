@@ -1,16 +1,20 @@
+import os
 import logging
 
 from aiogram import Router
 from aiogram.filters import Command
 from aiogram.types import Message
+from dotenv import load_dotenv
 
 from utils import fetch_html, get_schedule, subscribed_users
 
-
+load_dotenv()
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 router = Router()
+
+OWNER_ID = int(os.getenv("OWNER_ID"))
 
 
 @router.message(Command('start'))
@@ -22,15 +26,19 @@ async def send_welcome(message: Message):
         logger.info(f"User {user_id} subscribed.")
 
     await message.answer(
-        "Привет! Я могу отправить тебе расписание биатлона или футбола."
-        "\nНапиши /biathlon, чтобы узнать расписание биатлона."
-        "\nНапиши /football, чтобы узнать расписание футбола."
-        "\nНапиши /billiards, чтобы узнать расписание бильярда."
+        f'Привет! Я могу отправить тебе расписание биатлона или футбола.'
+        f'\nНапиши /biathlon, чтобы узнать расписание биатлона.'
+        f'\nНапиши /football, чтобы узнать расписание футбола.'
+        f'\nНапиши /billiards, чтобы узнать расписание бильярда.'
     )
 
 
 @router.message(Command("update"))
 async def update_html(message: Message):
+    if message.from_user.id != OWNER_ID:
+        await echo(message)
+        return
+
     await fetch_html()
     await message.answer(
         "HTML-страница обновлена! Теперь можно запрашивать расписание."
