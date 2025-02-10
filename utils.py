@@ -1,5 +1,7 @@
+import asyncio
 import datetime as dt
 import logging
+import pytz
 
 import aiohttp
 from bs4 import BeautifulSoup
@@ -13,10 +15,9 @@ ITEM_CLASS = 'teleprogram-schedule__item'
 TITLE_CLASS = 'teleprogram-item__title'
 TIME_CLASS = 'teleprogram-item__time'
 SCHEDULE_CLASS = 'schedule-line'
-
-
 subscribed_users = set()
 HTML_CACHE = None
+MSK_TZ = pytz.timezone("Europe/Moscow")
 
 
 async def fetch_html():
@@ -27,6 +28,24 @@ async def fetch_html():
             response.raise_for_status()
             HTML_CACHE = await response.text()
     logger.info("HTML-страница обновлена")
+
+
+async def fetch_html_auto():
+    while True:
+        now = dt.datetime.now(MSK_TZ)
+        new_update = now.replace(hour=0, minute=0, second=0, microsecond=0) + dt.timedelta(days=1)
+        seconds_until_update = (new_update - now).total_seconds()
+        logger.info(
+            "Следующее обновление HTML через "
+            f"{seconds_until_update:.2f} секунд"
+        )
+        await asyncio.sleep(seconds_until_update)
+
+        try:
+            await fetch_html()
+            logger.info("HTML-страница успешно обновлена в 00:00 МСК")
+        except Exception as e:
+            logger.error(f"Ошибка при обновлении HTML: {e}")
 
 
 async def get_schedule(sport_type: str):
