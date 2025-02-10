@@ -29,16 +29,22 @@ SCHEDULE_CLASS = 'schedule-line'
 
 
 subscribed_users = set()
+HTML_CACHE = None
+
+
+async def fetch_html():
+    global HTML_CACHE
+
+    async with aiohttp.ClientSession() as session:
+        async with session.get(BASE_URL) as response:
+            response.raise_for_status()
+            HTML_CACHE = await response.text()
+    logger.info("HTML-страница обновлена")
 
 
 async def get_schedule(sport_type: str):
-    url = BASE_URL
-    async with aiohttp.ClientSession() as session:
-        async with session.get(url) as response:
-            response.raise_for_status()
-            html = await response.text()
 
-    soup = BeautifulSoup(html, 'html.parser')
+    soup = BeautifulSoup(HTML_CACHE, 'html.parser')
     schedule_items = soup.find_all('li', class_=ITEM_CLASS)
     schedule_lines = soup.find_all('div', class_=SCHEDULE_CLASS)
 
@@ -114,6 +120,12 @@ async def send_welcome(message: types.Message):
         "\nНапиши /football, чтобы узнать расписание футбола."
         "\nНапиши /billiards, чтобы узнать расписание бильярда."
     )
+
+
+@dp.message(Command("update"))
+async def update_html(message: types.Message):
+    await fetch_html()
+    await message.answer("HTML-страница обновлена! Теперь можно запрашивать расписание.")
 
 
 @dp.message(Command("biathlon"))
