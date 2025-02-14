@@ -9,6 +9,7 @@ from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.types import BotCommandScopeChat, BotCommandScopeAllPrivateChats
 from dotenv import load_dotenv
 
+from database.engine import create_db
 from common.bot_cmds_list import private, owner_commands
 from handlers import admin_handler, user_handler
 from utils import fetch_html_auto, get_schedule, subscribed_users
@@ -21,6 +22,14 @@ API_TOKEN = os.getenv("API_TOKEN")
 OWNER_ID = int(os.getenv("OWNER_ID"))
 
 storage = MemoryStorage()
+
+
+async def on_startup():
+    await create_db()
+
+
+async def on_shutdown():
+    print('bot shutdown')
 
 
 async def check_schedule_and_notify(bot: Bot):
@@ -73,6 +82,8 @@ async def main():
     dp = Dispatcher(
         storage=storage
     )
+    dp.startup.register(on_startup)
+    dp.shutdown.register(on_shutdown)
     dp.include_routers(
         admin_handler.router,
         user_handler.router

@@ -1,8 +1,7 @@
 from sqlalchemy import (
     DateTime,
-    ForeignKey,
-    Numeric,
-    Text
+    Text,
+    func,
 )
 from sqlalchemy.orm import ( DeclarativeBase, Mapped, mapped_column, relationship
 )
@@ -20,4 +19,5 @@ class Base(DeclarativeBase):
 class Sport(Base):
     __tablename__ = "sports"
 
-    html_code = Mapped[str] = mapped_column(Text, nullable=True)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    html_code : Mapped[str] = mapped_column(Text, nullable=True)
