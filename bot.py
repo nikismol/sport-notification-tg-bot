@@ -56,15 +56,20 @@ async def check_schedule_and_notify(bot: Bot):
                         await bot.send_message(user_id, message)
                     except TelegramForbiddenError:
                         logger.warning(
-                            f"❌ Бот заблокирован пользователем {user_id}. Удаляем из подписчиков.")
+                            f"❌ Бот заблокирован пользователем {user_id}. "
+                            "Удаляем из подписчиков."
+                        )
                         to_remove.add(user_id)
                     except TelegramNotFound:
                         logger.warning(
-                            f"❌ Чат {user_id} не найден. Удаляем из подписчиков.")
+                            f"❌ Чат {user_id} не найден. "
+                            "Удаляем из подписчиков."
+                        )
                         to_remove.add(user_id)
                     except TelegramRetryAfter as e:
                         logger.warning(
-                            f"⚠️ Превышен лимит отправки сообщений. Ждём {e.timeout} секунд...")
+                            "⚠️ Превышен лимит отправки сообщений. "
+                            f"Ждём {e.timeout} секунд...")
                         await asyncio.sleep(e.timeout)
                     except Exception as e:
                         logger.error(

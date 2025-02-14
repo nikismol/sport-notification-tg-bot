@@ -3,7 +3,10 @@ from sqlalchemy import (
     Text,
     func,
 )
-from sqlalchemy.orm import ( DeclarativeBase, Mapped, mapped_column, relationship
+from sqlalchemy.orm import (
+    DeclarativeBase,
+    Mapped,
+    mapped_column,
 )
 
 
@@ -20,4 +23,4 @@ class Sport(Base):
     __tablename__ = "sports"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    html_code : Mapped[str] = mapped_column(Text, nullable=True)
+    html_code: Mapped[str] = mapped_column(Text, nullable=True)

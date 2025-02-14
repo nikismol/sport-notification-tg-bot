@@ -6,6 +6,7 @@ from aiogram.filters import Command
 from aiogram.types import Message
 from dotenv import load_dotenv
 
+from database.engine import session_maker
 from filters.chat_types import ChatTypeFilter
 from handlers.user_handler import echo
 from utils import fetch_html
@@ -25,8 +26,9 @@ async def update_html(message: Message):
     if message.from_user.id != OWNER_ID:
         await echo(message)
         return
-
-    await fetch_html()
-    await message.answer(
-        "HTML-страница обновлена! Теперь можно запрашивать расписание."
-    )
+    try:
+        async with session_maker() as db_session:
+            await fetch_html(db_session)
+        await message.answer("HTML обновлен успешно!")
+    except Exception as e:
+        await message.answer(f"Ошибка при обновлении: {e}")
