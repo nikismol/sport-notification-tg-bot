@@ -1,0 +1,23 @@
+from sqlalchemy import (
+    DateTime,
+    ForeignKey,
+    Numeric,
+    Text
+)
+from sqlalchemy.orm import ( DeclarativeBase, Mapped, mapped_column, relationship
+)
+
+
+class Base(DeclarativeBase):
+    created: Mapped[DateTime] = mapped_column(DateTime, default=func.now())
+    updated: Mapped[DateTime] = mapped_column(
+        DateTime,
+        default=func.now(),
+        onupdate=func.now()
+    )
+
+
+class Sport(Base):
+    __tablename__ = "sports"
+
+    html_code = Mapped[str] = mapped_column(Text, nullable=True)

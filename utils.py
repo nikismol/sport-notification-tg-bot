@@ -6,6 +6,9 @@ import pytz
 import aiohttp
 from bs4 import BeautifulSoup
 
+from database.engine import session_maker
+from database.orm_query import orm_add_html
+
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -26,7 +29,11 @@ async def fetch_html():
     async with aiohttp.ClientSession() as session:
         async with session.get(BASE_URL) as response:
             response.raise_for_status()
-            HTML_CACHE = await response.text()
+            data = await response.text()
+            HTML_CACHE = data
+            async with session_maker() as db_session:
+                await orm_add_html(db_session, data)
+
     logger.info("HTML-страница обновлена")
 
 
@@ -42,7 +49,8 @@ async def fetch_html_auto():
         await asyncio.sleep(seconds_until_update)
 
         try:
-            await fetch_html()
+            async with session_maker() as db_session:
+                await fetch_html(db_session)
             logger.info("HTML-страница успешно обновлена в 00:00 МСК")
         except Exception as e:
             logger.error(f"Ошибка при обновлении HTML: {e}")
