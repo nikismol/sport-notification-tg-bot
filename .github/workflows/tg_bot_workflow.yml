@@ -83,6 +83,7 @@ jobs:
             sudo docker-compose -f docker-compose.yaml down
             echo 'API_TOKEN=${{ secrets.MAIN_TOKEN }}' > .env
             echo 'OWNER_ID=${{ secrets.OWNER_ID }}' >> .env
+            echo 'DB_LITE=${{ secrets.DB_LITE }}' >> .env
             sudo docker-compose -f docker-compose.yaml up -d
 
   send_message:
