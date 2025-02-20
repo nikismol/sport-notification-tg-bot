@@ -9,9 +9,10 @@ from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.types import BotCommandScopeChat, BotCommandScopeAllPrivateChats
 from dotenv import load_dotenv
 
-from database.engine import create_db
+from database.engine import create_db, session_maker
 from common.bot_cmds_list import private, owner_commands
 from handlers import admin_handler, user_handler
+from middlewares.db import DataBaseMiddleware
 from utils import fetch_html_auto, get_schedule, subscribed_users
 
 load_dotenv()
@@ -93,6 +94,7 @@ async def main():
         admin_handler.router,
         user_handler.router
     )
+    dp.update.middleware(DataBaseMiddleware(session_pool=session_maker))
     await bot.delete_webhook(
         drop_pending_updates=True
     )

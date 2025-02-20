@@ -1,4 +1,5 @@
 from sqlalchemy import (
+    BigInteger,
     DateTime,
     Text,
     func,
@@ -24,3 +25,10 @@ class Sport(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     html_code: Mapped[str] = mapped_column(Text, nullable=True)
+
+
+class User(Base):
+    __tablename__ = "users"
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    user_id: Mapped[int] = mapped_column(BigInteger, unique=True)

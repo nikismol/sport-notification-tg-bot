@@ -31,4 +31,4 @@ docker-compose.override.yml
 logs
 .DS_Store
 
-my_base.db
+sport_info.db

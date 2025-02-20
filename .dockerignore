@@ -7,4 +7,4 @@ __pycache__/
 .DS_Store
 .env
 logs/
-my_base.db
+sport_info.db

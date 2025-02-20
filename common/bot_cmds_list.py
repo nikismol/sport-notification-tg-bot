@@ -13,6 +13,14 @@ private = [
         command="billiards",
         description="Показать расписание бильярда"
     ),
+    BotCommand(
+        command='subscribe',
+        description='Подписаться на рассылку'
+    ),
+    BotCommand(
+        command='unsubscribe',
+        description='Подписаться на рассылку'
+    )
 ]
 
 owner_commands = private + [

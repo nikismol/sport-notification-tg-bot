@@ -4,7 +4,7 @@ import pytz
 
 import aiohttp
 from bs4 import BeautifulSoup
-from datetime import datetime as dt
+from datetime import datetime as dt, timedelta
 
 from database.engine import session_maker
 from database.orm_query import orm_add_html, orm_get_html
@@ -33,14 +33,14 @@ async def fetch_html(db_session):
 
 
 async def fetch_html_auto():
-    now = dt.datetime.now(MSK_TZ)
+    now = dt.now(MSK_TZ)
 
     next_midnight = now.replace(
         hour=0,
         minute=0,
         second=0,
         microsecond=0
-    ) + dt.timedelta(
+    ) + timedelta(
         days=1
     )
 
@@ -55,7 +55,7 @@ async def fetch_html_auto():
             async with session_maker() as db_session:
                 await fetch_html(db_session)
             logger.info("HTML-страница успешно обновлена "
-                        f"в {dt.datetime.now(MSK_TZ)} МСК")
+                        f"в {dt.now(MSK_TZ)} МСК")
         except Exception as e:
             logger.error(f"Ошибка при обновлении HTML: {e}")
 
@@ -65,6 +65,10 @@ async def fetch_html_auto():
 async def get_schedule(sport_type: str):
     async with session_maker() as db_session:
         data = await orm_get_html(db_session)
+
+    if data is None:
+        raise ValueError(
+            "Ошибка: data равно None. Надо загрузить страницу.")
 
     soup = BeautifulSoup(data, 'html.parser')
     li_items = soup.find_all('li', class_=ITEM_CLASS)
