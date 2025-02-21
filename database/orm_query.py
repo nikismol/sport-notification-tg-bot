@@ -1,11 +1,12 @@
 from sqlalchemy import delete, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-
 from database.models import Sport, User
 
 
 """Обноление данных в БД"""
+
+
 async def orm_add_html(session: AsyncSession, data: str):
     query = select(Sport).where(Sport.id == 1)
     result = await session.execute(query)
@@ -33,21 +34,29 @@ async def orm_get_html(session: AsyncSession):
 
 
 """Добавление в БД подписчиков"""
+
+
 async def orm_add_user(session: AsyncSession, user_id: int):
-    query = select(User).where(user_id == user_id)
+    query = select(User).where(User.user_id == user_id)
     result = await session.execute(query)
-    if result.first() is None:
+    if result.scalar() is None:
         session.add(User(user_id=user_id))
         await session.commit()
 
 
 async def orm_get_user(session: AsyncSession, user_id: int):
-    query = select(User).where(user_id == user_id)
+    query = select(User).where(User.user_id == user_id)
     result = await session.execute(query)
     return result.first()
 
 
+async def orm_get_all_user(session: AsyncSession):
+    query = select(User.user_id)
+    result = await session.execute(query)
+    return result.all()
+
+
 async def orm_delete_user(session: AsyncSession, user_id: int):
-    query = delete(User).where(user_id == user_id)
+    query = delete(User).where(User.user_id == user_id)
     await session.execute(query)
     await session.commit()

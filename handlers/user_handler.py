@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.orm_query import orm_add_user, orm_delete_user, orm_get_user
 from filters.chat_types import ChatTypeFilter
-from utils import get_schedule
+from utils.get_program import get_schedule
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -45,7 +45,10 @@ async def delete_subscriber(message: Message, session: AsyncSession):
         await orm_delete_user(session, user_id)
         await message.answer('Вы успешно отписались от рассылки расписания')
     else:
-        await message.answer('Вы не подписаны или не вообще не подписывались на рассылку расписания')
+        await message.answer(
+            'Вы не подписаны или не вообще '
+            'не подписывались на рассылку расписания'
+        )
 
 
 @router.message(Command("biathlon"))
