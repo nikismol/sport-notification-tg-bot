@@ -24,15 +24,15 @@ async def get_schedule(sport_type: str):
 
     if data is None:
         raise ValueError(
-            "Ошибка: data равно None. Надо загрузить страницу.")
+            "Ошибка: data равно None. Надо загрузить страницу."
+        )
 
     soup = BeautifulSoup(data, 'html.parser')
     li_items = soup.find_all('li', class_=ITEM_CLASS)
 
     current_time_msk = int(dt.now(MSK_TZ).timestamp())
-    time_range = 3 * 3600
-    min_time = current_time_msk - time_range
-    max_time = current_time_msk + time_range
+    min_time = current_time_msk - (1.5 * 3600)
+    max_time = current_time_msk + (3 * 3600)
 
     schedule = []
 
@@ -47,14 +47,14 @@ async def get_schedule(sport_type: str):
             formatted_end_at = dt.fromtimestamp(end_time).strftime(
                 '%H:%M')
 
-            if sport_type in title.lower() and (
-                    min_time <= start_time <= max_time
-                    or
+            if sport_type.lower() in title.lower() and (
+                    min_time <= start_time <= max_time or
                     min_time <= end_time <= max_time
             ):
 
                 schedule.append(
-                    f"{formatted_start_at}-{formatted_end_at} - {title}"
+                    f"<u><i><b>{sport_type}</b></i></u>\n\n<strong>"
+                    f"{formatted_start_at}-"
+                    f"{formatted_end_at}</strong> - <i>{title}</i>\n"
                 )
-
     return schedule

@@ -59,8 +59,7 @@ async def send_biathlon_schedule(message: Message):
         else "На данный момент биатлон не запланирован."
     )
     await message.answer(
-        response,
-        parse_mode="Markdown"
+        response
     )
 
 
@@ -72,21 +71,19 @@ async def send_billiards_schedule(message: Message):
         else "На данный момент бильярд не запланирован."
     )
     await message.answer(
-        response,
-        parse_mode="Markdown"
+        response
     )
 
 
 @router.message(Command("football"))
 async def send_football_schedule(message: Message):
-    schedule = await get_schedule("футбол")
+    schedule = await get_schedule("Футбол")
     response = (
         "\n".join(schedule) if schedule
         else "На данный момент футбол не запланирован."
     )
     await message.answer(
-        response,
-        parse_mode="Markdown"
+        response
     )
 
 

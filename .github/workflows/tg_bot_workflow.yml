@@ -1,4 +1,4 @@
-name: tg-bot-aiogram-app workflow
+name: tg-bot-sport-notification workflow
 
 on:
   push:
