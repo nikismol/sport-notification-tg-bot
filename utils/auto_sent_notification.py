@@ -41,4 +41,4 @@ async def check_and_send_notification(bot):
         except Exception as e:
             logger.error(f"Error while checking schedule: {e}")
 
-        await asyncio.sleep(120)
+        await asyncio.sleep(7200)
